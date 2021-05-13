@@ -20,6 +20,7 @@ pcee_console_api_url="api.prismacloud.io"
 pcee_new_user_first_name="<FIRSTNAME>"
 pcee_new_user_last_name="<LASTNAME>"
 pcee_user_role_name="<PUT_THE_NAME_OF_THE_USER_ROLE_HERE>"
+pcee_new_user_email="<EMAIL_HERE>"
 pcee_new_user_time_zone="America/New_York"
 
 # Nothing needs to be altered below this line
@@ -51,7 +52,7 @@ pcee_retrieve_user_roles=$(curl --request GET --url https://"${pcee_console_api_
 pcee_user_role_id_api_for_payload=$(printf "${pcee_retrieve_user_roles}" | jq '.[] | {id: .id, name: .name}' | jq -r '.name, .id'| awk "/"${pcee_user_role_name}"/{getline;print}")
 
 # This formats the JSON payload for bash for the next curl command
-payload="{\"defaultRoleId\": \""${pcee_user_role_id_api_for_payload}"\", \"email\": \"test@qmycustomdomain.com\", \"firstName\": \""${pcee_new_user_first_name}"\", \"lastName\": \""${pcee_new_user_last_name}"\", \"roleIds\": [\""$(printf "${pcee_user_role_id_api_for_payload}")"\"], \"roleLimit\": "5", \"timeZone\": \""${pcee_new_user_time_zone}"\"}"
+payload="{\"defaultRoleId\": \""${pcee_user_role_id_api_for_payload}"\", \"email\": \""${pcee_new_user_email}"\", \"firstName\": \""${pcee_new_user_first_name}"\", \"lastName\": \""${pcee_new_user_last_name}"\", \"roleIds\": [\""$(printf "${pcee_user_role_id_api_for_payload}")"\"], \"roleLimit\": "5", \"timeZone\": \""${pcee_new_user_time_zone}"\"}"
 
 # This adds the new user
 curl -s --request POST --url https://"${pcee_console_api_url}"/v2/user \
