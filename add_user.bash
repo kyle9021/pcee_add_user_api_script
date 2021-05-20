@@ -49,7 +49,7 @@ pcee_retrieve_user_roles=$(curl --request GET --url https://"${pcee_console_api_
 --header "x-redlock-auth: "${pcee_auth_token}"")
 
 # This part finds the the user role as definied in the variable above and pulls the user role ID
-pcee_user_role_id_api_for_payload=$(printf "${pcee_retrieve_user_roles}" | jq '.[] | {id: .id, name: .name}' | jq -r '.name, .id'| awk "/"${pcee_user_role_name}"/{getline;print}")
+pcee_user_role_id_api_for_payload=$(printf "${pcee_retrieve_user_roles}" | jq '.[] | {id: .id, name: .name}' | jq -r '.name, .id'| awk "/""${pcee_user_role_name}""/{getline;print}")
 
 # This formats the JSON payload for bash for the next curl command
 payload="{\"defaultRoleId\": \""${pcee_user_role_id_api_for_payload}"\", \"email\": \""${pcee_new_user_email}"\", \"firstName\": \""${pcee_new_user_first_name}"\", \"lastName\": \""${pcee_new_user_last_name}"\", \"roleIds\": [\""$(printf "${pcee_user_role_id_api_for_payload}")"\"], \"roleLimit\": "5", \"timeZone\": \""${pcee_new_user_time_zone}"\"}"
