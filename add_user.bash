@@ -26,36 +26,36 @@ pcee_new_user_time_zone="America/New_York"
 # Nothing needs to be altered below this line
 
 # This variable formats everything correctly so that the next variable can be assigned.
-pcee_auth_body="{\"username\":\""${pcee_accesskey}"\", \"password\":\""${pcee_secretkey}"\"}"
+pcee_auth_body="{\"username\":\"${pcee_accesskey}\", \"password\":\"${pcee_secretkey}\"}"
 
 # This saves the auth token needed to access the CSPM side of the Prisma Cloud API to a variable I named $pcee_auth_token
 pcee_auth_token=$(curl --request POST \
---url https://"${pcee_console_api_url}"/login \
+--url "https://${pcee_console_api_url}/login" \
 --header 'Accept: application/json; charset=UTF-8' \
 --header 'Content-Type: application/json; charset=UTF-8' \
 --data "${pcee_auth_body}" | jq -r '.token')
 
 # This variable formats everything correctly so that the next variable can be assigned.
-pcee_compute_auth_body="{\"username\":\""${pcee_accesskey}"\", \"password\":\""${pcee_secretkey}"\"}"
+pcee_compute_auth_body="{\"username\":\"${pcee_accesskey}\", \"password\":\"${pcee_secretkey}\"}"
 
 # This saves the auth token needed to access the CWPP side of the Prisma Cloud API to a variable $pcee_compute_token
 pcee_compute_token=$(curl \
 -H "Content-Type: application/json" \
 -d "${pcee_compute_auth_body}" \
-"${pcee_console_url}"/api/v1/authenticate | jq -r '.token')
+"${pcee_console_url}/api/v1/authenticate" | jq -r '.token')
 
 # This retrieves all the user roles. 
-pcee_retrieve_user_roles=$(curl --request GET --url https://"${pcee_console_api_url}"/user/role \
---header "x-redlock-auth: "${pcee_auth_token}"")
+pcee_retrieve_user_roles=$(curl --request GET --url "https://${pcee_console_api_url}/user/role" \
+--header "x-redlock-auth: ${pcee_auth_token}")
 
 # This part finds the the user role as definied in the variable above and pulls the user role ID
-pcee_user_role_id_api_for_payload=$(printf "${pcee_retrieve_user_roles}" | jq '.[] | {id: .id, name: .name}' | jq -r '.name, .id'| awk "/""${pcee_user_role_name}""/{getline;print}")
+pcee_user_role_id_api_for_payload=$(printf %s "${pcee_retrieve_user_roles}" | jq '.[] | {id: .id, name: .name}' | jq -r '.name, .id'| awk "/""${pcee_user_role_name}""/{getline;print}")
 
 # This formats the JSON payload for bash for the next curl command
-payload="{\"defaultRoleId\": \""${pcee_user_role_id_api_for_payload}"\", \"email\": \""${pcee_new_user_email}"\", \"firstName\": \""${pcee_new_user_first_name}"\", \"lastName\": \""${pcee_new_user_last_name}"\", \"roleIds\": [\""$(printf "${pcee_user_role_id_api_for_payload}")"\"], \"roleLimit\": "5", \"timeZone\": \""${pcee_new_user_time_zone}"\"}"
+payload="{\"defaultRoleId\": \"${pcee_user_role_id_api_for_payload}\", \"email\": \"${pcee_new_user_email}\", \"firstName\": \"${pcee_new_user_first_name}\", \"lastName\": \"${pcee_new_user_last_name}\", \"roleIds\": [\"$(printf %s "${pcee_user_role_id_api_for_payload}")\"], \"roleLimit\": "5", \"timeZone\": \"${pcee_new_user_time_zone}\"}"
 
 # This adds the new user
-curl -s --request POST --url https://"${pcee_console_api_url}"/v2/user \
+curl -s --request POST --url "https://${pcee_console_api_url}/v2/user" \
 --header "Content-Type: application/json" \
---header "x-redlock-auth: "${pcee_auth_token}"" \
+--header "x-redlock-auth: ${pcee_auth_token}" \
 --data-raw "${payload}"
