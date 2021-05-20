@@ -55,7 +55,7 @@ pcee_user_role_id_api_for_payload=$(printf %s "${pcee_retrieve_user_roles}" | jq
 payload="{\"defaultRoleId\": \"${pcee_user_role_id_api_for_payload}\", \"email\": \"${pcee_new_user_email}\", \"firstName\": \"${pcee_new_user_first_name}\", \"lastName\": \"${pcee_new_user_last_name}\", \"roleIds\": [\"$(printf %s "${pcee_user_role_id_api_for_payload}")\"], \"roleLimit\": "5", \"timeZone\": \"${pcee_new_user_time_zone}\"}"
 
 # This adds the new user
-curl -s --request POST --url "https://${pcee_console_api_url}/v2/user" \
+curl --request POST --url "https://${pcee_console_api_url}/v2/user" \
 --header "Content-Type: application/json" \
 --header "x-redlock-auth: ${pcee_auth_token}" \
 --data-raw "${payload}"
